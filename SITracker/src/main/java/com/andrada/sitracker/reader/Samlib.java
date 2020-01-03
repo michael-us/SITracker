@@ -26,7 +26,6 @@ import com.andrada.sitracker.db.dao.AuthorDao;
 import com.andrada.sitracker.db.dao.PublicationDao;
 import com.andrada.sitracker.db.manager.SiDBHelper;
 import com.andrada.sitracker.exceptions.AddAuthorException;
-import com.andrada.sitracker.analytics.AnalyticsManager;
 import com.andrada.sitracker.util.LogUtils;
 import com.andrada.sitracker.util.SamlibPageHelper;
 import com.github.kevinsawicki.http.HttpRequest;

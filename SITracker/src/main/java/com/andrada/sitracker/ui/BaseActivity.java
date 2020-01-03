@@ -40,7 +40,6 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 
 import com.andrada.sitracker.BuildConfig;
-import com.andrada.sitracker.Constants;
 import com.andrada.sitracker.R;
 import com.andrada.sitracker.analytics.AnalyticsManager;
 import com.andrada.sitracker.analytics.MarkAsReadEvent;

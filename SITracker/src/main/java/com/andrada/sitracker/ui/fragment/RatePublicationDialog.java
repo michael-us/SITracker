@@ -23,12 +23,11 @@ import android.view.View;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.andrada.sitracker.Constants;
 import com.andrada.sitracker.R;
+import com.andrada.sitracker.analytics.AnalyticsManager;
 import com.andrada.sitracker.analytics.RatePublicationEvent;
 import com.andrada.sitracker.events.RatingResultEvent;
 import com.andrada.sitracker.exceptions.RatingException;
-import com.andrada.sitracker.analytics.AnalyticsManager;
 import com.andrada.sitracker.util.RatingUtil;
 
 import org.androidannotations.annotations.Background;

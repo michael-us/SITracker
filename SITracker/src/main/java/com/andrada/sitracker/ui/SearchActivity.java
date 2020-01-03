@@ -16,7 +16,6 @@
 
 package com.andrada.sitracker.ui;
 
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
@@ -46,7 +45,6 @@ import android.widget.Spinner;
 
 import com.andrada.sitracker.Constants;
 import com.andrada.sitracker.R;
-import com.andrada.sitracker.analytics.AnalyticsManager;
 import com.andrada.sitracker.contracts.AppUriContract;
 import com.andrada.sitracker.ui.fragment.RemoteAuthorsFragment;
 import com.github.amlcurran.showcaseview.ShowcaseView;

@@ -16,7 +16,6 @@
 
 package com.andrada.sitracker.ui;
 
-
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.ComponentName;
@@ -27,13 +26,12 @@ import android.support.v4.content.IntentCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.andrada.sitracker.Constants;
 import com.andrada.sitracker.R;
+import com.andrada.sitracker.analytics.AnalyticsManager;
 import com.andrada.sitracker.analytics.ViewAuthorEvent;
 import com.andrada.sitracker.contracts.AppUriContract;
 import com.andrada.sitracker.events.AuthorSelectedEvent;
 import com.andrada.sitracker.ui.fragment.PublicationsFragment_;
-import com.andrada.sitracker.analytics.AnalyticsManager;
 
 import org.androidannotations.annotations.EActivity;
 

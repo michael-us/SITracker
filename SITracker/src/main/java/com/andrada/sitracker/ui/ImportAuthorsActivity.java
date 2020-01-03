@@ -16,7 +16,6 @@
 
 package com.andrada.sitracker.ui;
 
-
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.ComponentName;
@@ -36,8 +35,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.andrada.sitracker.Constants;
 import com.andrada.sitracker.R;
+import com.andrada.sitracker.analytics.AnalyticsManager;
 import com.andrada.sitracker.analytics.ImportAuthorsEvent;
 import com.andrada.sitracker.analytics.ImportEvent;
 import com.andrada.sitracker.events.CancelImportEvent;
@@ -47,7 +46,6 @@ import com.andrada.sitracker.tasks.ImportAuthorsTask_;
 import com.andrada.sitracker.tasks.io.AuthorFileImportContext;
 import com.andrada.sitracker.ui.components.ImportProgressView;
 import com.andrada.sitracker.ui.components.ImportProgressView_;
-import com.andrada.sitracker.analytics.AnalyticsManager;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;

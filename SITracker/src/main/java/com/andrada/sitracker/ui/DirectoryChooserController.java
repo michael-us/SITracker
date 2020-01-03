@@ -17,17 +17,8 @@
 package com.andrada.sitracker.ui;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.andrada.sitracker.R;
 import com.andrada.sitracker.ui.fragment.DirectoryChooserFragment;
-import com.andrada.sitracker.util.permission.Permissions;
-import com.andrada.sitracker.util.permission.RuntimePermissionsInteraction;
 import com.andrada.sitracker.util.permission.RuntimePermissionsUtils;
 
 public class DirectoryChooserController implements DirectoryChooserFragment.OnFragmentInteractionListener {

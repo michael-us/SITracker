@@ -18,12 +18,10 @@ package com.andrada.sitracker.ui;
 
 import android.app.Activity;
 
-import com.andrada.sitracker.Constants;
+import com.andrada.sitracker.analytics.AnalyticsManager;
 import com.andrada.sitracker.analytics.ExportAuthorsEvent;
-import com.andrada.sitracker.analytics.FBAEvent;
 import com.andrada.sitracker.tasks.ExportAuthorsTask;
 import com.andrada.sitracker.ui.fragment.DirectoryChooserFragment;
-import com.andrada.sitracker.analytics.AnalyticsManager;
 
 public class ExportAuthorsController implements DirectoryChooserFragment.OnFragmentInteractionListener {
 

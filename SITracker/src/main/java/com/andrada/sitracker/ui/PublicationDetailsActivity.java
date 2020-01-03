@@ -18,7 +18,6 @@ package com.andrada.sitracker.ui;
 
 import android.app.Fragment;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.Toolbar;
@@ -29,6 +28,7 @@ import android.view.WindowManager;
 
 import com.andrada.sitracker.R;
 import com.andrada.sitracker.ui.fragment.PublicationInfoFragment_;
+
 public class PublicationDetailsActivity extends SimpleSinglePaneActivity {
 
     private boolean shouldBeFloatingWindow = false;

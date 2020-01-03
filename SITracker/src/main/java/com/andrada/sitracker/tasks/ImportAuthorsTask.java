@@ -29,8 +29,8 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
-import com.andrada.sitracker.Constants;
 import com.andrada.sitracker.R;
+import com.andrada.sitracker.analytics.AnalyticsManager;
 import com.andrada.sitracker.analytics.ImportEvent;
 import com.andrada.sitracker.db.manager.SiDBHelper;
 import com.andrada.sitracker.events.ImportUpdates;
@@ -38,7 +38,6 @@ import com.andrada.sitracker.reader.SiteDetector;
 import com.andrada.sitracker.reader.SiteStrategy;
 import com.andrada.sitracker.ui.ImportAuthorsActivity_;
 import com.andrada.sitracker.ui.SiMainActivity_;
-import com.andrada.sitracker.analytics.AnalyticsManager;
 import com.andrada.sitracker.util.SamlibPageHelper;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
