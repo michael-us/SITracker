@@ -37,7 +37,7 @@ dependencies {
     compile 'com.google.firebase:firebase-crash:10.2.4'
     compile 'com.google.android.gms:play-services-tagmanager:10.2.4'
     compile 'com.google.android.gms:play-services-plus:10.2.4'
-    compile('com.github.afollestad.material-dialogs:core:0.9.0.1@aar') {
+    compile('com.github.afollestad.material-dialogs:core:0.9.4.5@aar') {
         transitive = true
     }
     compile('com.afollestad:material-cab:0.1.12@aar') {
