@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.util.Date;
 
 @DatabaseTable(daoClass = AuthorDaoImpl.class, tableName = "authors")
+@SuppressWarnings("WeakerAccess")
 public class Author implements Serializable {
 
     private static final long serialVersionUID = -4329046928579678402L;

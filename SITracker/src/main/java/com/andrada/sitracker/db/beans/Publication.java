@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @DatabaseTable(daoClass = PublicationDaoImpl.class, tableName = "publications")
+@SuppressWarnings("WeakerAccess")
 public class Publication implements Serializable {
 
     private static final long serialVersionUID = 2332804144509172310L;

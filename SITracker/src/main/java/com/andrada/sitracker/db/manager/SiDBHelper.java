@@ -20,8 +20,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.andrada.sitracker.db.beans.Author;
+import com.andrada.sitracker.db.beans.Composition;
+import com.andrada.sitracker.db.beans.CompositionFragment;
 import com.andrada.sitracker.db.beans.Publication;
 import com.andrada.sitracker.db.dao.AuthorDao;
+import com.andrada.sitracker.db.dao.CompositionDao;
+import com.andrada.sitracker.db.dao.CompositionFragmentDao;
 import com.andrada.sitracker.db.dao.PublicationDao;
 import com.andrada.sitracker.util.SamlibPageHelper;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
@@ -37,12 +41,16 @@ import java.util.concurrent.Callable;
 public class SiDBHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String DATABASE_NAME = "siinformer.db";
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 13;
 
     @Nullable
     private PublicationDao publicationDao;
     @Nullable
     private AuthorDao authorDao;
+    @Nullable
+    private CompositionDao compositionDao;
+    @Nullable
+    private CompositionFragmentDao compositionFragmentDao;
 
     public SiDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -54,6 +62,9 @@ public class SiDBHelper extends OrmLiteSqliteOpenHelper {
         try {
             TableUtils.createTable(connectionSource, Author.class);
             TableUtils.createTable(connectionSource, Publication.class);
+            TableUtils.createTable(connectionSource, Composition.class);
+            TableUtils.createTable(connectionSource, CompositionFragment.class);
+            createCompositionFragmentsIndexes();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -63,7 +74,14 @@ public class SiDBHelper extends OrmLiteSqliteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource,
                           int oldVersion, int newVersion) {
         try {
+            boolean orphansDeleted = false;
             while (++oldVersion <= newVersion) {
+                if (!orphansDeleted && oldVersion >= 9) {
+                    //Delete all orphaned publications
+                    getPublicationDao().queryRaw("DELETE FROM publications WHERE author_id NOT IN " +
+                            "(SELECT _id FROM authors) OR author_id IS NULL");
+                    orphansDeleted = true;
+                }
                 switch (oldVersion) {
                     case 2: {
                         getPublicationDao().executeRaw("ALTER TABLE 'publications' ADD COLUMN oldSize INTEGER;");
@@ -102,9 +120,6 @@ public class SiDBHelper extends OrmLiteSqliteOpenHelper {
                         break;
                     }
                     case 9: {
-                        //Delete all orphaned publications
-                        getPublicationDao().queryRaw("DELETE FROM publications WHERE author_id NOT IN " +
-                                "(SELECT _id FROM authors) OR author_id IS NULL");
                         //Due to the fact that sqlite does not support ADD CONSTRAINT - recreate table
                         getPublicationDao().executeRaw(
                                 "ALTER TABLE publications RENAME TO tmp_publications;");
@@ -159,14 +174,10 @@ public class SiDBHelper extends OrmLiteSqliteOpenHelper {
                         getPublicationDao().executeRaw("ALTER TABLE 'publications' ADD COLUMN updatesIgnored SMALLINT DEFAULT 0 NOT NULL;");
                         break;
                     }
-                    case 11: {
-                        getPublicationDao().queryRaw("DELETE FROM publications WHERE author_id NOT IN " +
-                                "(SELECT _id FROM authors) OR author_id IS NULL");
-                        break;
-                    }
-                    case 12: {
-                        getPublicationDao().queryRaw("DELETE FROM publications WHERE author_id NOT IN " +
-                                "(SELECT _id FROM authors) OR author_id IS NULL");
+                    case 13: {
+                        TableUtils.createTable(connectionSource, Composition.class);
+                        TableUtils.createTable(connectionSource, CompositionFragment.class);
+                        createCompositionFragmentsIndexes();
                         break;
                     }
                 }
@@ -202,11 +213,47 @@ public class SiDBHelper extends OrmLiteSqliteOpenHelper {
         return publicationDao;
     }
 
+    @Nullable
+    public CompositionDao getCompositionDao() {
+        if (compositionDao == null) {
+            try {
+                compositionDao = getDao(Composition.class);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return compositionDao;
+    }
+
+    @Nullable
+    public CompositionFragmentDao getCompositionFragmentDao() {
+        if (compositionFragmentDao == null) {
+            try {
+                compositionFragmentDao = getDao(CompositionFragment.class);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return compositionFragmentDao;
+    }
+
     @Override
     public void close() {
         super.close();
         publicationDao = null;
         authorDao = null;
+        compositionDao = null;
+        compositionFragmentDao = null;
     }
 
+    private void createCompositionFragmentsIndexes() throws SQLException {
+        getCompositionFragmentDao().executeRaw(
+                "CREATE UNIQUE INDEX IF NOT EXISTS `composition_fragment_order_idx` " +
+                        "ON `composition_fragments` (`composition_id`, `order`)"
+        );
+        getCompositionFragmentDao().executeRaw(
+                "CREATE UNIQUE INDEX IF NOT EXISTS `composition_fragment_publication_idx` " +
+                        "ON `composition_fragments` (`composition_id`, `publication_id`)"
+        );
+    }
 }
