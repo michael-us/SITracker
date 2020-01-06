@@ -15,7 +15,6 @@
   -->
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-
     <!-- Generic strings -->
     <string name="app_name">SI Tracker</string>
     <string name="no_network_error">No network</string>
@@ -46,12 +45,10 @@
     <string name="action_about">About</string>
     <string name="check_for_updates">Checking for updates</string>
 
-
     <!-- New Pubs fragment -->
     <string name="action_sweep_all">Mark all as read</string>
     <string name="action_undo">Undo</string>
     <string name="all_read">All marked as read</string>
-
 
     <!-- Authors fragment -->
     <string name="action_open_in_browser">Open selected in browser</string>
@@ -78,7 +75,6 @@
         </item>
     </plurals>
 
-
     <!-- Publication list fragment -->
     <string name="cannot_download_publication">Cannot download publication. Check your internet connection.</string>
     <string name="publication_error_url">Cannot download publication. Publications seems to have a wrong url. The only thing that could help is to remove and re-add the author</string>
@@ -86,6 +82,7 @@
     <string name="publication_error_storage">Cannot save publication. Your external storage seems to be inaccessible.</string>
     <string name="publication_error_unknown">Cannot download publication. Some internal error occurred.</string>
     <string name="publications_downloading">Downloading publication…</string>
+    <string name="publication_compositions">Compositions</string>
 
     <!-- Search activity -->
     <string name="title_search">Search</string>
@@ -104,7 +101,6 @@
     <string name="cannot_search_internal">An internal error occurred. Please try again.</string>
     <string name="cannot_search_unknown">An unknown error occurred while searching. Please try again.</string>
 
-
     <!-- Author add and import -->
     <string name="cannot_add_author">Cannot add author.</string>
     <string name="supported_urls">Only samlib.ru and budclub.ru author urls are supported.</string>
@@ -116,7 +112,6 @@
     <string name="cannot_add_author_no_name">Cannot add author. No author name found.</string>
     <string name="cannot_add_author_unknown">Cannot add author. An unexpected error occurred.</string>
     <string name="cannot_add_author_no_publications">Cannot add author. No publications found.</string>
-
 
     <!-- Settings activity -->
     <string name="title_settings">Settings</string>
@@ -145,7 +140,6 @@
     <string name="pref_usage_category_title">Usage statistics</string>
     <string name="pref_opt_out_statistics_title">Opt out</string>
     <string name="pref_opt_out_statistics_summ">Prevent sending usage statistics to the author.</string>
-
 
     <!-- Import Export authors activity -->
     <string name="title_import">Import authors</string>
@@ -177,7 +171,6 @@
     <string name="book_folder_name">Books</string>
     <string name="cannot_write_export_file">Error writing to export file</string>
 
-
     <!-- Publication details activity -->
     <string name="title_publications_details">Publication Details</string>
     <string name="action_open_pub_in_browser">Open in browser</string>
@@ -195,12 +188,10 @@
     <string name="publication_rating_submit_error">Failed to submit your vote. Please try again later.</string>
     <string name="publication_rating_vote_date">You rated %1$s</string>
 
-
     <!-- About Dialog -->
     <string name="app_version_format">Version: %1$s</string>
     <string name="about_licenses">Open Source Licenses</string>
     <string name="whats_new">What\'s new</string>
-
 
     <!-- Notifications -->
     <string name="notification_title">Authors updated</string>
@@ -223,7 +214,6 @@
             authors updated
         </item>
     </plurals>
-
 
     <!-- Showcase texts -->
     <string name="showcase_getting_started_title">Getting started</string>
@@ -378,5 +368,4 @@
         </section>
     ]]></string>
     <string name="write_storage_permissions">For publication saving and author export, the application needs to write to external storage.</string>
-
 </resources>
