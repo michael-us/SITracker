@@ -166,10 +166,9 @@ public class PublicationsFragment extends BaseListFragment implements
 
     @Override
     public void onGroupExpand(int groupPosition) {
-        PublicationsAdapter.CategoryValue category = (PublicationsAdapter.CategoryValue) adapter.getGroup(groupPosition);
-        if (category != null) {
-            AnalyticsManager.getInstance().logEvent(new ViewCategoryEvent(category.categoryName));
-        }
+        final PublicationsAdapter.CategoryValue category = (PublicationsAdapter.CategoryValue) adapter.getGroup(groupPosition);
+        if (category != null)
+            AnalyticsManager.getInstance().logEvent(new ViewCategoryEvent(category.getName()));
     }
 
     @Override

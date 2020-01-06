@@ -27,6 +27,7 @@ import android.widget.ListView;
 
 import com.andrada.sitracker.Constants;
 import com.andrada.sitracker.R;
+import com.andrada.sitracker.analytics.AnalyticsManager;
 import com.andrada.sitracker.analytics.PublicationOpenedEvent;
 import com.andrada.sitracker.contracts.IsNewItemTappedListener;
 import com.andrada.sitracker.contracts.SIPrefs_;
@@ -38,7 +39,6 @@ import com.andrada.sitracker.ui.components.PublicationCategoryItemView;
 import com.andrada.sitracker.ui.components.PublicationCategoryItemView_;
 import com.andrada.sitracker.ui.components.PublicationItemView;
 import com.andrada.sitracker.ui.components.PublicationItemView_;
-import com.andrada.sitracker.analytics.AnalyticsManager;
 import com.github.amlcurran.showcaseview.ShowcaseView;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
@@ -64,11 +64,8 @@ import static com.andrada.sitracker.util.LogUtils.LOGE;
 @EBean
 public class PublicationsAdapter extends BaseExpandableListAdapter implements
         IsNewItemTappedListener, AdapterView.OnItemLongClickListener {
-
-
-    private final Map<Long, Publication> mDownloadingPublications = new HashMap<Long, Publication>();
-    List<CategoryValue> mCategories = new ArrayList<CategoryValue>();
-    List<List<Publication>> mChildren = new ArrayList<List<Publication>>();
+    private final Map<Long, Publication> mDownloadingPublications = new HashMap<>();
+    private List<CategoryValue> mCategories = new ArrayList<>();
     @OrmLiteDao(helper = SiDBHelper.class)
     PublicationDao publicationsDao;
     @RootContext
@@ -85,41 +82,31 @@ public class PublicationsAdapter extends BaseExpandableListAdapter implements
     public void reloadPublicationsForAuthorId(long id) {
         try {
             shouldShowImages = prefs.displayPubImages().get();
-            List<Publication> pubs = publicationsDao.getSortedPublicationsForAuthorId(id);
-            List<CategoryValue> newCategories = new ArrayList<CategoryValue>();
-            List<List<Publication>> newChildren = new ArrayList<List<Publication>>();
 
-            for (Publication publication : pubs) {
-                CategoryValue possibleVal = new CategoryValue(publication.getCategory());
-                if (!newCategories.contains(possibleVal)) {
-                    if (publication.getNew()) {
-                        possibleVal.incrementNewCount();
-                    }
-                    newCategories.add(possibleVal);
-                } else if (publication.getNew()) {
-                    newCategories.get(newCategories.indexOf(possibleVal)).incrementNewCount();
+            final List<CategoryValue> categories = new ArrayList<>();
+            final Map<CategoryInfo, CategoryValue> categoriesByInfo = new HashMap<>();
+
+            final List<Publication> publications = publicationsDao.getSortedPublicationsForAuthorId(id);
+            for (Publication publication : publications) {
+                final CategoryInfo info = new CategoryInfo(publication.getCategory(), false);
+                CategoryValue category = categoriesByInfo.get(info);
+                if (category == null) {
+                    category = new CategoryValue(info);
+                    categoriesByInfo.put(info, category);
+                    categories.add(category);
                 }
+                category.add(publication);
             }
 
-            for (CategoryValue category : newCategories) {
-                List<Publication> categoryList = new ArrayList<Publication>();
-                for (Publication publication : pubs) {
-                    if (category.equals(publication.getCategory())) {
-                        categoryList.add(publication);
-                    }
-                }
-                newChildren.add(categoryList);
-            }
-            updateAdapterDataSet(newCategories, newChildren);
+            updateAdapterDataSet(categories);
         } catch (SQLException e) {
             LOGE("SiTracker", "Exception while reloading pubs", e);
         }
     }
 
     @UiThread(propagation = UiThread.Propagation.REUSE)
-    void updateAdapterDataSet(List<CategoryValue> newCategories, List<List<Publication>> newChildren) {
-        mCategories = newCategories;
-        mChildren = newChildren;
+    void updateAdapterDataSet(List<CategoryValue> categories) {
+        mCategories = categories;
         postDataSetChanged();
     }
 
@@ -148,7 +135,7 @@ public class PublicationsAdapter extends BaseExpandableListAdapter implements
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return mChildren.get(groupPosition).size();
+        return mCategories.get(groupPosition).getPublications().size();
     }
 
     @Override
@@ -158,8 +145,8 @@ public class PublicationsAdapter extends BaseExpandableListAdapter implements
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        List<Publication> items = mChildren.get(groupPosition);
-        return items.get(childPosition);
+        final List<Publication> publications = mCategories.get(groupPosition).getPublications();
+        return publications.get(childPosition);
     }
 
     @Override
@@ -169,8 +156,8 @@ public class PublicationsAdapter extends BaseExpandableListAdapter implements
 
     @Override
     public long getChildId(int groupPosition, int childPosition) {
-        List<Publication> items = mChildren.get(groupPosition);
-        return items.get(childPosition).getId();
+        final List<Publication> publications = mCategories.get(groupPosition).getPublications();
+        return publications.get(childPosition).getId();
     }
 
     @Override
@@ -192,8 +179,9 @@ public class PublicationsAdapter extends BaseExpandableListAdapter implements
         } else {
             publicationCategoryView = (PublicationCategoryItemView) convertView;
         }
-        publicationCategoryView.bind(mCategories.get(groupPosition).categoryName,
-                mChildren.get(groupPosition).size(), mCategories.get(groupPosition).getNewCount());
+        final CategoryValue category = mCategories.get(groupPosition);
+        publicationCategoryView.bind(category.getName(), category.getPublications().size(),
+                category.getNewCount());
         return publicationCategoryView;
     }
 
@@ -256,9 +244,12 @@ public class PublicationsAdapter extends BaseExpandableListAdapter implements
     protected void updateStatusOfPublication(@NotNull Publication pub) {
         if (pub.getNew()) {
             try {
-                int index = mCategories.indexOf(new CategoryValue(pub.getCategory()));
-                if (index >= 0 && index < mCategories.size()) {
-                    mCategories.get(index).decrementNewCount();
+                final CategoryInfo info = new CategoryInfo(pub.getCategory(), false);
+                for (CategoryValue category: mCategories) {
+                    if (category.info.equals(info)) {
+                        category.decrementNewCount();
+                        break;
+                    }
                 }
                 boolean authorNewChanged = publicationsDao.markPublicationRead(pub);
                 EventBus.getDefault().post(new PublicationMarkedAsReadEvent(authorNewChanged));
@@ -275,8 +266,8 @@ public class PublicationsAdapter extends BaseExpandableListAdapter implements
             long packedPosition = ((ExpandableListView) parent).getExpandableListPosition(position);
             int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
             int childPosition = ExpandableListView.getPackedPositionChild(packedPosition);
-            List<Publication> items = mChildren.get(groupPosition);
-            Publication pub = items.get(childPosition);
+            final List<Publication> publications = mCategories.get(groupPosition).getPublications();
+            Publication pub = publications.get(childPosition);
 
             if (pub.getLoading()) {
                 //Ignore if it is loading now
@@ -304,20 +295,51 @@ public class PublicationsAdapter extends BaseExpandableListAdapter implements
         void publicationShare(Publication pub, boolean forceDownload);
     }
 
+    private class CategoryInfo {
+        public final String name;
+        public final boolean isCustom;
+
+        private CategoryInfo(@NotNull String categoryName, boolean isCustom) {
+            this.name = categoryName;
+            this.isCustom = isCustom;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            final CategoryInfo that = (CategoryInfo) o;
+            return name.equals(that.name) && isCustom == that.isCustom;
+        }
+
+        @Override
+        public int hashCode() {
+            return name.hashCode() * 31 + (isCustom ? 1 : 0);
+        }
+    }
+
     public class CategoryValue {
-        public final String categoryName;
+        private final CategoryInfo info;
+        private final List<Publication> publications;
         private int newCount;
 
-        private CategoryValue(@NotNull String categoryName) {
-            this.categoryName = categoryName;
-            this.newCount = 0;
+        private CategoryValue(CategoryInfo info) {
+            this.info = info;
+            publications = new ArrayList<>();
+            newCount = 0;
         }
 
-        public void incrementNewCount() {
-            ++newCount;
+        public String getName(){
+            return info.name;
         }
 
-        public void decrementNewCount() {
+        public boolean isCustom() {
+            return info.isCustom;
+        }
+
+        private void decrementNewCount() {
             --newCount;
         }
 
@@ -325,24 +347,14 @@ public class PublicationsAdapter extends BaseExpandableListAdapter implements
             return newCount;
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            CategoryValue that = (CategoryValue) o;
-
-            return categoryName.equals(that.categoryName);
-
+        public List<Publication> getPublications() {
+            return publications;
         }
 
-        @Override
-        public int hashCode() {
-            return categoryName.hashCode();
-        }
-
-        public boolean equals(String value) {
-            return categoryName.equals(value);
+        public void add(Publication publication) {
+            publications.add(publication);
+            if (publication.getNew())
+                ++newCount;
         }
     }
 }
